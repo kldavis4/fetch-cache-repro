@@ -13,8 +13,6 @@ export default async function ReproPage(props: { params: Promise<{ id: string, b
     let logs: string[] = [];
 
     let res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv?id=${encodeURIComponent(id)}${cacheBust(bust)}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
     })
     if (res.status === 404) {
@@ -28,8 +26,6 @@ export default async function ReproPage(props: { params: Promise<{ id: string, b
         logs.push(`Seeded value with version ${newValue.version} - request success`);
 
         res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv?id=${encodeURIComponent(id)}${cacheBust(bust)}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
           cache: 'no-store',
         });
 
@@ -65,8 +61,6 @@ export default async function ReproPage(props: { params: Promise<{ id: string, b
     }
 
     const updateCheckRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv?id=${encodeURIComponent(id)}${cacheBust(bust)}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
     })
     const updatedValue = await updateCheckRes.json();
