@@ -23,7 +23,6 @@ export default async function ReproPage(props: { params: Promise<{ id: string, b
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: id, value: newValue }),
-        cache: 'no-store',
       });
       if (putRes.status === 200) {
         logs.push(`Seeded value with version ${newValue.version} - request success`);
@@ -57,7 +56,6 @@ export default async function ReproPage(props: { params: Promise<{ id: string, b
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key: id, value: newValue }),
-      cache: 'no-store',
     });
     if (putRes.status === 200) {
       logs.push(`Updated value to version ${newValue.version} - request success`);
