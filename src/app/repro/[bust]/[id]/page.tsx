@@ -85,7 +85,6 @@ export default async function ReproPage(props: any) {
 
   return (
     <main style={{ padding: 24 }}>
-      <h1>KV Loops Test for: {id}</h1>
       <pre style={{ background: '#eee', padding: 16, borderRadius: 8 }}>
         {logs.join('\n')}
       </pre>
