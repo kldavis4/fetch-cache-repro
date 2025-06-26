@@ -1,17 +1,24 @@
 export default async function ReproPage(props: any) {
   const { params } = props;
-  const { id } = await params;
+  const { id, bust } = await params;
 
+  const cacheBust = (bust: string) => {
+    if (bust === 'bust') {
+      return `&__cb=${Math.random()}`
+    } else {
+      return ''
+    }
+  }
   const doTest = async (id: string): Promise<string[]> => {
     let logs: string[] = [];
 
-    let res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv?id=${encodeURIComponent(id)}`, {
+    let res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv?id=${encodeURIComponent(id)}${cacheBust(bust)}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
     })
     if (res.status === 404) {
-      const newValue = { value: String(Math.random()), version: 0 };
+      const newValue = { random: String(Math.random()), version: 0 };
       const putRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -20,6 +27,19 @@ export default async function ReproPage(props: any) {
       });
       if (putRes.status === 200) {
         logs.push(`Seeded value with version ${newValue.version} - request success`);
+
+        res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv?id=${encodeURIComponent(id)}${cacheBust(bust)}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-cache',
+        });
+
+        if (res.status === 200) {
+          logs.push(`Successfully seeded value: ${JSON.stringify(newValue)}`);
+        } else {
+          logs.push(`Failed to get seeded value - request failed ${res.status} - aborting`);
+          return logs;
+        }
       } else {
         logs.push(`Failed to seed value - request failed - aborting`);
         return logs;
@@ -30,6 +50,8 @@ export default async function ReproPage(props: any) {
     }
 
     const currentValue = await res.json();
+    logs.push(`Current value: ${JSON.stringify(currentValue)}`);
+
     const newValue = { ...currentValue, version: (currentValue.version || 0) + 1 };
     const putRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv`, {
       method: 'PUT',
@@ -44,16 +66,16 @@ export default async function ReproPage(props: any) {
       return logs;
     }
 
-    const updateCheckRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv?id=${encodeURIComponent(id)}`, {
+    const updateCheckRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/kv?id=${encodeURIComponent(id)}${cacheBust(bust)}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store',
     })
     const updatedValue = await updateCheckRes.json();
-    if (updatedValue.value?.version === newValue.version) {
+    if (updatedValue?.version === newValue.version) {
       logs.push(`Successfully updated value to version ${newValue.version}`);
     } else {
-      logs.push(`Update check failed: expected version ${newValue.version}, got ${updatedValue.value?.version} - aborting`);
+      logs.push(`Update check failed: expected version ${newValue.version}, got ${updatedValue?.version} - aborting`);
     }
 
     return logs;

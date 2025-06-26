@@ -25,6 +25,7 @@ export async function PUT(req: NextRequest) {
   try {
     const data = await req.json();
     const { key, value } = data;
+    console.log("PUT request data:", data, value);
     if (!key || value === undefined) {
       return NextResponse.json({ error: 'Missing key or value' }, { status: 400 });
     }
@@ -61,7 +62,7 @@ export async function GET(req: NextRequest) {
     if (value === null || value === undefined) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
-    return NextResponse.json({ value });
+    return NextResponse.json(value);
   } catch (e) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
