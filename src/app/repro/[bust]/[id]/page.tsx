@@ -1,4 +1,4 @@
-export default async function ReproPage(props: any) {
+export default async function ReproPage(props: { params: Promise<{ id: string, bust: string }>}) {
   const { params } = props;
   const { id, bust } = await params;
 
